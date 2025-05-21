@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sweet Cake - Boutique</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #fff;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .swiper {
+      width: 100%;
+      height: auto;
+    }
+    .swiper-slide {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+    .product-img {
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+      cursor: pointer;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .product-img:hover {
+      transform: scale(1.05);
+    }
+    .product-name {
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+    .product-price {
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .add-btn {
+      background: #ff69b4;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .add-btn:hover {
+      background: #ff1493;
+    }
+    /* Notification panier - modifiée pour bas à gauche */
+    .notification-cart {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: #fff0f5;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      padding: 15px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+    }
+    .notification-cart h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 1px solid #ff69b4;
+      padding-bottom: 5px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    .cart-total {
+      font-weight: bold;
+      margin-top: 10px;
+      font-size: 16px;
+      border-top: 1px solid #ff69b4;
+      padding-top: 8px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Sweet Cake - Boutique</h1>
+
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper" id="product-list">
+      <!-- Produits générés ici -->
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <!-- Notification panier temporaire -->
+  <div class="notification-cart" id="notificationCart">
+    <h2>Panier</h2>
+    <div id="cartItems"></div>
+    <div class="cart-total" id="cartTotal">Total : 0 €</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Produits avec deux images chacun
+    const produits = [
+      {nom: 'Gâteau Marguerite Gribouillé', prix: 4, img1: 'images/daisydoodle cake.png', img2: 'images/pink.png'},
+      {nom: 'Gâteau choco-gourmand', prix: 5, img1: 'images/chocolat loadeed cake.png', img2: 'images/chocolat loaded cake2.png'},
+      {nom: 'Gâteau pistache', prix: 3, img1: 'images/pistachio cake.png', img2: 'images/pistachio cake kunafa2.png'},
+      {nom: 'Gâteau framboise royale', prix: 3.5, img1: 'images/rasberry royale cake.png', img2: 'images/rasberry royale cake2.png'},
+      {nom: 'Gâteau soie ivoire', prix: 4.5, img1: 'images/ivory silk cake2.png', img2: 'images/ivory silk cake2.png'},
+      {nom: 'Gâteau coeur griboullie', prix: 5.5, img1: 'images/hearts doodle cake.png', img2: 'images/hearts doodle cake2.png'},
+      {nom: 'Gâteau cerise griboullie', prix: 6, img1: 'images/cherries doodle cake.png', img2: 'images/cherries doodle cake2.png'},
+      {nom: 'Gâteau ribans verts', prix: 3.2, img1: 'images/green ribons and ruffles cake.png', img2: 'images/green ribons and ruffles cake2.png'},
+      {nom: 'Gâteau theme cars de diney', prix: 4.8, img1:'images/disney cars themed cake.png', img2:'images/disney cars themed cake 2.png'},
+      {nom: 'Gâteau theme disney lion king', prix: 5.2, img1: 'images/disney lion king themed cake.png', img2: 'images/disney lion2.png'},
+      {nom: 'Gâteau fondant végan sans gluten', prix: 3.8, img1: 'images/gluten free vegan fudge cake.png', img2: 'images/gluten free vegan fudge cake2.png'},
+      {nom: 'Mini gâteau jaune à deux étages avec rubans et volants', prix: 2.5, img1: 'images/yellow mini two tier ribbons and ruffles cake.png', img2: 'images/yellow2.png'},
+      {nom: 'Gâteau moelleux vanille jaune sans gluten', prix: 3, img1: 'images/velvet one.png', img2: 'images/gluten free yellow vanille velvet cake.png'},
+      {nom: 'Gâteau au chocolat', prix: 4.1, img1: 'images/choco.png', img2: 'images/choco2.png'},
+      {nom: 'Gâteau vanille', prix: 5.5, img1: 'images/white.png', img2: 'images/white2.png'},
+      {nom: 'Petit gâteau jaune à deux étages avec rubans et volants', prix: 5.7, img1: 'images/yellow mini two tier ribbons and ruffles cake.png', img2: 'images/yellow2.png'},
+      {nom: 'Génoise Victoria végane', prix: 4.3, img1: 'images/vegan vectoria sponge.png', img2: 'images/sponge2.png'},
+      {nom: 'Gâteau Tutti Frutti à deux étages garni', prix: 7.5, img1: 'images/tuti.png', img2: 'images/tutti fruiti two tier loaded cake 2.png'},
+      {nom: 'Gâteau mauve', prix: 4.6, img1: 'images/move2.png', img2: 'images/move.png'}
+    ];
+
+    const productList = document.getElementById('product-list');
+    const notificationCart = document.getElementById('notificationCart');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+
+    let cart = [];
+    let total = 0;
+    let hideTimeout;
+
+    // Générer les produits dans le swiper
+    produits.forEach((p, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'swiper-slide';
+      slide.innerHTML = `
+        <img src="${p.img1}" alt="${p.nom}" class="product-img"
+          onmouseover="this.src='${p.img2}'"
+          onmouseout="this.src='${p.img1}'"
+          onclick="agrandirImage('${p.img1}')"
+        />
+        <div class="product-name">${p.nom}</div>
+        <div class="product-price">${p.prix.toFixed(2)} €</div>
+        <button class="add-btn" onclick="ajouterProduit(${index})">Ajouter</button>
+      `;
+      productList.appendChild(slide);
+    });
+
+    // Initialiser swiper en horizontal, 3 produits visibles sur desktop, adaptatif
+    const swiper = new Swiper('.mySwiper', {
+      slidesPerView: 3,
+      spaceBetween: 15,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      breakpoints: {
+        320: { slidesPerView: 1 },
+        480: { slidesPerView: 2 },
+        768: { slidesPerView: 3 },
+        1024: { slidesPerView: 4 },
+        1200: { slidesPerView: 5 }
+      }
+    });
+
+    // Ajouter produit au panier
+    function ajouterProduit(index) {
+      const p = produits[index];
+      cart.push(p);
+      total += p.prix;
+      afficherPanier();
+      afficherNotification();
+    }
+
+    // Afficher contenu du panier
+    function afficherPanier() {
+      cartItems.innerHTML = '';
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.textContent = `${item.nom}`;
+        const prixDiv = document.createElement('div');
+        prixDiv.textContent = `${item.prix.toFixed(2)} €`;
+        div.appendChild(prixDiv);
+        cartItems.appendChild(div);
+      });
+      cartTotal.textContent = `Total : ${total.toFixed(2)} €`;
+    }
+
+    // Afficher notification panier temporaire
+    function afficherNotification() {
+      clearTimeout(hideTimeout);
+      notificationCart.style.display = 'flex';
+      hideTimeout = setTimeout(() => {
+        notificationCart.style.display = 'none';
+        viderPanier();
+      }, 3000);
+    }
+
+    // Vider panier après notification
+    function viderPanier() {
+      cart = [];
+      total = 0;
+      cartItems.innerHTML = '';
+      cartTotal.textContent = 'Total : 0 €';
+    }
+
+    // Ouvrir image agrandie dans nouvelle fenêtre
+    function agrandirImage(src) {
+      window.open(src, '_blank', 'width=400,height=400');
+    }
+  </script>
+</body>
+</html>
